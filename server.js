@@ -15,6 +15,9 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
 const mongoSanitize = require('express-mongo-sanitize');
 const { handleError } = require('./utils/errorHandler');
+const userRoutes = require('./routes/userRoutes');
+const postRoutes = require('./routes/postRoutes');
+const geoLocationMiddleware = require('./middlewares/geoLocationMiddleware');
 
 const app = express();
 const port = process.env.PORT || 3004;
@@ -28,6 +31,12 @@ mongoose.connect(dbConfig.mongoURI, {
 }).catch((err) => {
     logger.error(`Error connecting to MongoDB: ${err}`);
 });
+
+// mongoose.connect('mongodb://localhost:27017/your-db', {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+//     useFindAndModify: false
+// });
 
 // Close MongoDB connection when the app is closed
 
@@ -84,6 +93,9 @@ app.use(cors());
 app.use(helmet());
 app.use(morgan('common', { stream: { write: message => logger.info(message.trim()) }}));
 
+// Geo-location middleware
+app.use(geoLocationMiddleware);
+
 // Compression
 app.use(compression());
 
@@ -92,6 +104,8 @@ app.use('/api/', limiter);
 
 // Routes
 app.use('/api/items', itemRoutes);
+app.use('/api/posts', postRoutes);
+app.use('/api/users', userRoutes);
 
 // Error handling
 app.use(notFound);

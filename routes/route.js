@@ -17,6 +17,9 @@ const itemSchema = require('../validation/item')
 // router.put('/:id', authMiddleware, itemController.updateItem);
 // router.delete('/:id', authMiddleware, itemController.deleteItem);
 
+// router.post('/admin', authMiddleware, roleMiddleware(['admin']), adminController.createSomething);
+
+
 // CREATE
 router.post('/', itemController.createItem)
 
