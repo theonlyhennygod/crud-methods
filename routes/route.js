@@ -6,6 +6,17 @@ const req = require('express/lib/request')
 const validate = require('../middlewares/validate')
 const itemSchema = require('../validation/item')
 
+
+// Adding authMiddleware to the routes
+
+// const authMiddleware = require('../middlewares/auth')
+
+// router.post('/', authMiddleware, itemController.createItem);
+// router.get('/', authMiddleware, itemController.getAllItems);
+// router.get('/:id', authMiddleware, itemController.getItemById);
+// router.put('/:id', authMiddleware, itemController.updateItem);
+// router.delete('/:id', authMiddleware, itemController.deleteItem);
+
 // CREATE
 router.post('/', itemController.createItem)
 

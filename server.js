@@ -13,6 +13,8 @@ const errorHandler = require('./middleware/errorHandler');
 const logger = require('./utils/logger');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
+const mongoSanitize = require('express-mongo-sanitize');
+const { handleError } = require('./utils/errorHandler');
 
 const app = express();
 const port = process.env.PORT || 3004;
@@ -25,6 +27,18 @@ mongoose.connect(dbConfig.mongoURI, {
     logger.info('Connected to MongoDB');
 }).catch((err) => {
     logger.error(`Error connecting to MongoDB: ${err}`);
+});
+
+// Close MongoDB connection when the app is closed
+
+process.on('SIGINT', async () => {
+    await mongoose.connection.close();
+    process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+    await mongoose.connection.close();
+    process.exit(0);
 });
 
 // Rate limiting
@@ -55,6 +69,14 @@ const specs = swaggerJsDoc(options);
 
 // Serve Swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+
+// Data sanitization
+app.use(mongoSanitize());
+
+// Error handling
+app.use((err, req, res, next) => {
+    handleError(err, res);
+});
 
 // Middleware
 app.use(express.json());
